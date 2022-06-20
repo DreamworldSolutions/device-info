@@ -1,0 +1,27 @@
+{
+  "name": "@dreamworld/device-info",
+  "version": "0.0.0-development",
+  "description": "It's used to get basic details of device(layout, touch and virtual keyboard).",
+  "main": "device-info.js",
+  "type": "module",
+  "repository": "git@github.com:DreamworldSolutions/device-info.git",
+  "author": "Dhruval Kodinariya <dhruval@hisab.co>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "semantic-release": "17.0.8"
+  },
+  "release": {
+    "branches": [
+      "+([0-9])?(.{+([0-9]),x}).x",
+      "master",
+      {
+          "name": "feature/*",
+          "prerelease": "${name.replace(/^feature\\//g, \"\")}",
+          "channel": "${name.replace(/^feature\\//g, \"\")}"
+      }
+    ]
+  }
+}
