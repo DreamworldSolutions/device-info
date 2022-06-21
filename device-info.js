@@ -6,17 +6,13 @@ export default class DeviceInfo {
    * It initializes `layout`, `touch` and `vkb`.
    * It also start listening/managing of `layout`, `touch` and `vkb`
    */
-  static init(store) {
+  static {
     this.layout = "small"; //TODO: set initial value
-    this.touch = false; //TODO: set initial value
+    this.touch = true; //TODO: set initial value
     this.vkb = false; //TODO: set initial value
 
-    //Data Structure: { $eventName: $eventHandlerFunction }
+    //Data Structure: { $eventName: $eventHandlerFunction[] }
     this._eventHandlerMap = {};
-
-    if (store) {
-      this.initRedux(store);
-    }
 
     this._manageLayout();
     this._manageTouch();
@@ -28,8 +24,9 @@ export default class DeviceInfo {
    * @param {Object} store
    */
   static initRedux(store) {
+    this._store = store;
     let initialState = this.info();
-    store.dispatch({ type: actions.INIT, payload: initialState });
+    this._store.dispatch({ type: actions.INIT, payload: initialState });
   }
 
   /**
@@ -50,7 +47,7 @@ export default class DeviceInfo {
    */
   static _manageLayout() {
     //TODO: detect layout changes
-    this._emit("layout-changed", layout);
+    this._emit("change", { layout });
     this._store &&
       this._store.dispatch({ type: actions.LAYOUT_CHANGED, payload: layout });
   }
@@ -61,7 +58,7 @@ export default class DeviceInfo {
    */
   static _manageTouch() {
     //TODO: detect touch changes
-    this._emit("touch-changed", touch);
+    this._emit("change", { touch });
     this._store &&
       this._store.dispatch({ type: actions.TOUCH_CHANGED, payload: touch });
   }
@@ -72,7 +69,7 @@ export default class DeviceInfo {
    */
   static _manageVKB() {
     //TODO: detect virtual keyboard changes
-    this._emit("vkb-changed", vkb);
+    this._emit("change", { vkb });
     this._store &&
       this._store.dispatch({ type: actions.VKB_CHANGED, payload: vkb });
   }
@@ -83,9 +80,7 @@ export default class DeviceInfo {
    * @param {Object} eventHandler
    */
   static on(eventName, eventHandler) {
-    let supportedEvents = ["layout-changed", "touch-changed", "vkb-changed"];
-
-    if (supportedEvents.indexOf(eventName) === -1) {
+    if (eventName !== "change") {
       throw `unsupported eventName=${eventName}`;
     }
 
@@ -113,9 +108,7 @@ export default class DeviceInfo {
     this.layout = this.constructor.layout;
     this.touch = this.constructor.touch;
     this.vkb = this.constructor.vkb;
-    this._onLayoutChanged = this._onLayoutChanged.bind(this);
-    this._onTouchChanged = this._onTouchChanged.bind(this);
-    this._onVKBChanged = this._onVKBChanged.bind(this);
+    this._onChange = this._onChange.bind(this);
     this._init();
   }
 
@@ -123,32 +116,17 @@ export default class DeviceInfo {
    * Intialize instance
    */
   _init() {
-    this.constructor.on("layout-changed", this._onLayoutChanged);
-    this.constructor.on("touch-changed", this._onLayoutChanged);
-    this.constructor.on("vkb-changed", this._onVKBChanged);
+    this.constructor.on("change", this._onChange);
   }
 
   /**
-   * Called on `layout-changed` event
-   * @param {String} layout
+   * Called on `change` event
+   * It updates changed properties value
+   * @param {Object} details contains only properties which are changed
    */
-  _onLayoutChanged(layout) {
-    this.layout = layout;
-  }
-
-  /**
-   * Called on `touch-changed` event
-   * @param {Boolean} touch
-   */
-  _onTouchChanged(touch) {
-    this.touch = touch;
-  }
-
-  /**
-   * Called on `vkb-changed` event
-   * @param {Boolean} vkb
-   */
-  _onVKBChanged(vkb) {
-    this.vkb = vkb;
+  _onChange({ layout, touch, vkb }) {
+    this.layout = layout || this.layout;
+    this.touch = touch || this.touch;
+    this.vkb = vkb || this.vkb;
   }
 }
