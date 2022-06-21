@@ -1,5 +1,18 @@
+import { isTouchDevice } from '@dreamworld/web-util';
+import forEach from 'lodash-es/forEach.js';
+import EventEmitter from '@dreamworld/event-emitter';
 import * as actions from "./actions.js";
 export * as selectors from "./selectors.js";
+
+const mediaQueriesBylayout = {
+  "small": "only screen and (max-width: 600px)",
+  "medium": "only screen and (min-width: 600px) and (max-width: 999px)",
+  "large": "only screen and (min-width: 1000px) and (max-width: 1299px)",
+  "hd": "only screen and (min-width: 1300px) and (max-width: 1899px)",
+  "fullhd": "only screen and (min-width: 1900px)"
+};
+
+var ee = new EventEmitter();
 
 export default class DeviceInfo {
   /**
@@ -7,16 +20,16 @@ export default class DeviceInfo {
    * It also start listening/managing of `layout`, `touch` and `vkb`
    */
   static {
-    this.layout = "small"; //TODO: set initial value
-    this.touch = true; //TODO: set initial value
-    this.vkb = false; //TODO: set initial value
+    this.layout = this._getCurrentLayout();
+    this.touch = isTouchDevice();
+    this.vkb = isTouchDevice();
 
     //Data Structure: { $eventName: $eventHandlerFunction[] }
     this._eventHandlerMap = {};
 
     this._manageLayout();
-    this._manageTouch();
-    this._manageVKB();
+    // this._manageTouch();
+    // this._manageVKB();
   }
 
   /**
@@ -37,8 +50,21 @@ export default class DeviceInfo {
     return {
       layout: this.layout,
       touch: this.touch,
-      vkb: this.vkb,
+      vkb: this.vkb
     };
+  }
+
+  static _getCurrentLayout() {
+    let currentLayout;
+
+    forEach(mediaQueriesBylayout, (query, layout) => {
+      if (window.matchMedia(query).matches) {
+        currentLayout = layout;
+        return false;
+      }
+    });
+
+    return currentLayout;
   }
 
   /**
@@ -46,10 +72,25 @@ export default class DeviceInfo {
    * It invokes all of the event handlers of `layout-changed` whenever layout is changed.
    */
   static _manageLayout() {
-    //TODO: detect layout changes
-    this._emit("change", { layout });
-    this._store &&
-      this._store.dispatch({ type: actions.LAYOUT_CHANGED, payload: layout });
+    const mediaChangeHandler = () => {
+      forEach(mediaQueriesBylayout, (query, layout) => {
+        if (window.matchMedia(query).matches) {
+          if(this.layout === layout) {
+            return false;
+          }
+
+          this.layout = layout;
+          ee.emit("change", { layout });
+          this._store &&
+            this._store.dispatch({ type: actions.LAYOUT_CHANGED, payload: layout });
+          return false;
+        }
+      });
+    };
+
+    forEach(mediaQueriesBylayout, (query) => {
+      window.matchMedia(query).addListener(mediaChangeHandler);
+    });
   }
 
   /**
@@ -58,7 +99,7 @@ export default class DeviceInfo {
    */
   static _manageTouch() {
     //TODO: detect touch changes
-    this._emit("change", { touch });
+    ee.emit("change", { touch });
     this._store &&
       this._store.dispatch({ type: actions.TOUCH_CHANGED, payload: touch });
   }
@@ -69,7 +110,7 @@ export default class DeviceInfo {
    */
   static _manageVKB() {
     //TODO: detect virtual keyboard changes
-    this._emit("change", { vkb });
+    ee.emit("change", { vkb });
     this._store &&
       this._store.dispatch({ type: actions.VKB_CHANGED, payload: vkb });
   }
@@ -84,7 +125,7 @@ export default class DeviceInfo {
       throw `unsupported eventName=${eventName}`;
     }
 
-    //TODO: register into `_eventHandlerMap`
+    ee.on(eventName, eventHandler);
   }
 
   /**
@@ -93,15 +134,8 @@ export default class DeviceInfo {
    * @param {Object} eventHandler
    */
   static off(eventName, eventHandler) {
-    //TODO: unregister from `_eventHandlerMap`
+    ee.off(eventName, eventHandler);
   }
-
-  /**
-   * It's used by internally to emit events
-   * It invokes registered event handlers in `_eventHandlerMap` for given eventName
-   * @param {String} eventName
-   */
-  static _emit(eventName) {}
 
   constructor(host) {
     host && (this.host = host).addController(this);
@@ -128,5 +162,6 @@ export default class DeviceInfo {
     this.layout = layout || this.layout;
     this.touch = touch || this.touch;
     this.vkb = vkb || this.vkb;
+    this.host.requestUpdate();
   }
 }
