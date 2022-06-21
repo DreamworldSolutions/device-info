@@ -78,4 +78,3 @@ Path: `device-info`
 | layout        | String     | Possible values: `small`, `medium`, `large`, `hd` and `fullhd`. |
 | touch         | Boolean    | `true` if device touch is enabled. `false` otherwise. |
 | vkb           | Boolean    | `true` if device virtual keyboard is supported. `false` otherwise. |
-
