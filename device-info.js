@@ -2,6 +2,7 @@ import { isTouchDevice } from '@dreamworld/web-util';
 import forEach from 'lodash-es/forEach.js';
 import EventEmitter from '@dreamworld/event-emitter';
 import * as actions from "./actions.js";
+import reducer from "./reducer.js";
 export * as selectors from "./selectors.js";
 
 const mediaQueriesBylayout = {
@@ -24,12 +25,9 @@ export default class DeviceInfo {
     this.touch = isTouchDevice();
     this.vkb = isTouchDevice();
 
-    //Data Structure: { $eventName: $eventHandlerFunction[] }
-    this._eventHandlerMap = {};
-
     this._manageLayout();
-    // this._manageTouch();
-    // this._manageVKB();
+    this._manageTouch();
+    this._manageVKB();
   }
 
   /**
@@ -38,6 +36,11 @@ export default class DeviceInfo {
    */
   static initRedux(store) {
     this._store = store;
+
+    store.addReducers({
+      'device-info': reducer
+    });
+
     let initialState = this.info();
     this._store.dispatch({ type: actions.INIT, payload: initialState });
   }
@@ -98,21 +101,57 @@ export default class DeviceInfo {
    * It invokes all of the event handlers of `touch-changed` whenever layout is changed.
    */
   static _manageTouch() {
-    //TODO: detect touch changes
-    ee.emit("change", { touch });
-    this._store &&
-      this._store.dispatch({ type: actions.TOUCH_CHANGED, payload: touch });
+    const changeHandler = () => {
+      ee.emit("change", { touch: this.touch });
+      this._store &&
+        this._store.dispatch({ type: actions.TOUCH_CHANGED, payload: this.touch });
+    };
+
+    this._listenMouseMove(changeHandler);
+    this._listenTouchEvent(changeHandler);
+  }
+
+  /**
+   * It starts listening on `mousemove` event.
+   * It sets `touch=false` and invokes given `changeHandler` only if touch is true
+   * @param {Object} changeHandler 
+   */
+  static _listenMouseMove(changeHandler) {
+    window.addEventListener('mousemove', (e) => {
+      if(!this.touch) {
+        return;
+      }
+
+      this.touch = false;
+      changeHandler();
+    });
+  }
+
+  /**
+   * It starts listening on `touchmove` event.
+   * It sets `touch=true` and invokes given `changeHandler` only if touch is false
+   * @param {Object} changeHandler 
+   */
+  static _listenTouchEvent(changeHandler) {
+    window.addEventListener('touchmove', (e) => {
+      if(this.touch) {
+        return;
+      }
+
+      this.touch = true;
+      changeHandler();
+    });
   }
 
   /**
    * Starts to manage `vkb`.
-   * It invokes all of the event handlers of `vkb-changed` whenever layout is changed.
+   * It invokes all of the event handlers of `vkb-changed` whenever virtual keyboard is changed.
    */
   static _manageVKB() {
     //TODO: detect virtual keyboard changes
-    ee.emit("change", { vkb });
-    this._store &&
-      this._store.dispatch({ type: actions.VKB_CHANGED, payload: vkb });
+    // ee.emit("change", { vkb });
+    // this._store &&
+    //   this._store.dispatch({ type: actions.VKB_CHANGED, payload: vkb });
   }
 
   /**

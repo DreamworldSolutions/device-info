@@ -5,19 +5,19 @@ import {
   VKB_CHANGED
 } from './actions.js';
 
-export default (state, action) => {
+export default (state = {}, action) => {
   switch (action.type) {
     case INIT:
-      return state;
+      return { ...action.payload };
       
     case LAYOUT_CHANGED:
-      return state;
+      return { ...state, layout: action.payload };
 
     case TOUCH_CHANGED:
-      return state;
+      return { ...state, touch: action.payload };
 
     case VKB_CHANGED:
-      return state;
+      return { ...state, vkb: action.payload };
 
     default:
       return state;
