@@ -32,7 +32,7 @@ export default class DeviceInfo {
   }
 
   /**
-   *
+   * It initializes redux state
    * @param {Object} store
    */
   static initRedux(store) {
@@ -73,7 +73,7 @@ export default class DeviceInfo {
 
   /**
    * Starts to manage `layout`.
-   * It invokes all of the event handlers of `layout-changed` whenever layout is changed.
+   * It dispatches `change` event whenever `layout` is changed.
    */
   static _manageLayout() {
     const mediaChangeHandler = () => {
@@ -102,7 +102,7 @@ export default class DeviceInfo {
 
   /**
    * Starts to manage `touch`.
-   * It invokes all of the event handlers of `touch-changed` whenever layout is changed.
+   * It dispatches `change` event whenever `touch` is changed.
    */
   static _manageTouch() {
     const changeHandler = () => {
@@ -142,7 +142,7 @@ export default class DeviceInfo {
   }
 
   /**
-   * It starts listening on `touchmove` event.
+   * It starts listening on `touchmove` and `touchstart` events.
    * It sets `touch=true` and invokes given `changeHandler` only if touch is false
    * @param {Object} changeHandler
    */
@@ -162,7 +162,7 @@ export default class DeviceInfo {
 
   /**
    * Starts to manage `vkb`.
-   * It invokes all of the event handlers of `vkb-changed` whenever virtual keyboard is changed.
+   * It dispatches `change` event whenever `vkb` is changed.
    */
   static _manageVKB() {
     //TODO: detect virtual keyboard changes
@@ -172,7 +172,7 @@ export default class DeviceInfo {
   }
 
   /**
-   * It's used to bind event handlers of events like `layout-changed`, `touch-changed` and `vkb-changed`
+   * It's used to bind given eventHandler of given eventName
    * @param {String} eventName
    * @param {Object} eventHandler
    */
@@ -185,11 +185,15 @@ export default class DeviceInfo {
   }
 
   /**
-   * It's used to unbind event handlers of events like `layout-changed`, `touch-changed` and `vkb-changed`
+   * It's used to unbind given eventHandler of given eventName
    * @param {String} eventName
    * @param {Object} eventHandler
    */
   static off(eventName, eventHandler) {
+    if (eventName !== "change") {
+      throw `unsupported eventName=${eventName}`;
+    }
+
     ee.off(eventName, eventHandler);
   }
 
