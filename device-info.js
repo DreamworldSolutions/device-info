@@ -1,16 +1,17 @@
-import { isTouchDevice } from '@dreamworld/web-util';
-import forEach from 'lodash-es/forEach.js';
-import EventEmitter from '@dreamworld/event-emitter';
+import { isTouchDevice } from "@dreamworld/web-util";
+import forEach from "lodash-es/forEach.js";
+import debounce from "lodash-es/debounce.js";
+import EventEmitter from "@dreamworld/event-emitter";
 import * as actions from "./actions.js";
 import reducer from "./reducer.js";
 export * as selectors from "./selectors.js";
 
 const mediaQueriesBylayout = {
-  "small": "only screen and (max-width: 600px)",
-  "medium": "only screen and (min-width: 600px) and (max-width: 999px)",
-  "large": "only screen and (min-width: 1000px) and (max-width: 1299px)",
-  "hd": "only screen and (min-width: 1300px) and (max-width: 1899px)",
-  "fullhd": "only screen and (min-width: 1900px)"
+  small: "only screen and (max-width: 600px)",
+  medium: "only screen and (min-width: 600px) and (max-width: 999px)",
+  large: "only screen and (min-width: 1000px) and (max-width: 1299px)",
+  hd: "only screen and (min-width: 1300px) and (max-width: 1899px)",
+  fullhd: "only screen and (min-width: 1900px)",
 };
 
 var ee = new EventEmitter();
@@ -38,7 +39,7 @@ export default class DeviceInfo {
     this._store = store;
 
     store.addReducers({
-      'device-info': reducer
+      "device-info": reducer,
     });
 
     let initialState = this.info();
@@ -53,7 +54,7 @@ export default class DeviceInfo {
     return {
       layout: this.layout,
       touch: this.touch,
-      vkb: this.vkb
+      vkb: this.vkb,
     };
   }
 
@@ -78,14 +79,17 @@ export default class DeviceInfo {
     const mediaChangeHandler = () => {
       forEach(mediaQueriesBylayout, (query, layout) => {
         if (window.matchMedia(query).matches) {
-          if(this.layout === layout) {
+          if (this.layout === layout) {
             return false;
           }
 
           this.layout = layout;
           ee.emit("change", { layout });
           this._store &&
-            this._store.dispatch({ type: actions.LAYOUT_CHANGED, payload: layout });
+            this._store.dispatch({
+              type: actions.LAYOUT_CHANGED,
+              payload: layout,
+            });
           return false;
         }
       });
@@ -104,43 +108,56 @@ export default class DeviceInfo {
     const changeHandler = () => {
       ee.emit("change", { touch: this.touch });
       this._store &&
-        this._store.dispatch({ type: actions.TOUCH_CHANGED, payload: this.touch });
+        this._store.dispatch({
+          type: actions.TOUCH_CHANGED,
+          payload: this.touch,
+        });
     };
 
     this._listenMouseMove(changeHandler);
-    this._listenTouchEvent(changeHandler);
+    this._listenTouchEvents(changeHandler);
   }
 
   /**
    * It starts listening on `mousemove` event.
    * It sets `touch=false` and invokes given `changeHandler` only if touch is true
-   * @param {Object} changeHandler 
+   * @param {Object} changeHandler
    */
   static _listenMouseMove(changeHandler) {
-    window.addEventListener('mousemove', (e) => {
-      if(!this.touch) {
-        return;
-      }
+    window.addEventListener(
+      "mousemove",
+      debounce((e) => {
+        if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) {
+          return;
+        }
 
-      this.touch = false;
-      changeHandler();
-    });
+        if (!this.touch) {
+          return;
+        }
+
+        this.touch = false;
+        changeHandler();
+      }, 200)
+    );
   }
 
   /**
    * It starts listening on `touchmove` event.
    * It sets `touch=true` and invokes given `changeHandler` only if touch is false
-   * @param {Object} changeHandler 
+   * @param {Object} changeHandler
    */
-  static _listenTouchEvent(changeHandler) {
-    window.addEventListener('touchmove', (e) => {
-      if(this.touch) {
+  static _listenTouchEvents(changeHandler) {
+    const eventHandler = debounce((e) => {
+      if (this.touch) {
         return;
       }
 
       this.touch = true;
       changeHandler();
-    });
+    }, 200);
+
+    window.addEventListener("touchmove", eventHandler);
+    window.addEventListener("touchstart", eventHandler);
   }
 
   /**
@@ -198,9 +215,9 @@ export default class DeviceInfo {
    * @param {Object} details contains only properties which are changed
    */
   _onChange({ layout, touch, vkb }) {
-    this.layout = layout || this.layout;
-    this.touch = touch || this.touch;
-    this.vkb = vkb || this.vkb;
+    this.layout = this.constructor.layout;
+    this.touch = this.constructor.touch;
+    this.vkb = this.constructor.vkb;
     this.host.requestUpdate();
   }
 }
