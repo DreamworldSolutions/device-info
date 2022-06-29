@@ -25,3 +25,11 @@ export const touch = (state) => {
 export const vkb = (state) => {
   return get(state, `device-info.vkb`);
 };
+
+/**
+ * It returns `true` if currently hover is applicable to the elements. `false` otherwise.
+ * @param {Object} state 
+ */
+ export const hover = (state) => {
+  return get(state, `device-info.hover`);
+};

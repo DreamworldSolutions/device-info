@@ -1,7 +1,5 @@
-import { isTouchDevice } from "@dreamworld/web-util";
-import forEach from "lodash-es/forEach.js";
-import debounce from "lodash-es/debounce.js";
 import EventEmitter from "@dreamworld/event-emitter";
+import forEach from "lodash-es/forEach.js";
 import * as actions from "./actions.js";
 import reducer from "./reducer.js";
 export * as selectors from "./selectors.js";
@@ -23,11 +21,13 @@ export default class DeviceInfo {
    */
   static {
     this.layout = this._getCurrentLayout();
-    this.touch = isTouchDevice();
-    this.vkb = isTouchDevice();
+    this.touch = !window.matchMedia('(any-pointer: fine)').matches;
+    this.vkb = !window.matchMedia('(any-pointer: fine)').matches;
+    this.hover = window.matchMedia('(any-hover: hover)').matches;
 
     this._manageLayout();
     this._manageTouch();
+    this._manageHover();
     this._manageVKB();
   }
 
@@ -55,6 +55,7 @@ export default class DeviceInfo {
       layout: this.layout,
       touch: this.touch,
       vkb: this.vkb,
+      hover: this.hover
     };
   }
 
@@ -96,7 +97,7 @@ export default class DeviceInfo {
     };
 
     forEach(mediaQueriesBylayout, (query) => {
-      window.matchMedia(query).addListener(mediaChangeHandler);
+      window.matchMedia(query).addEventListener('change', mediaChangeHandler);
     });
   }
 
@@ -105,59 +106,38 @@ export default class DeviceInfo {
    * It dispatches `change` event whenever `touch` is changed.
    */
   static _manageTouch() {
-    const changeHandler = () => {
-      ee.emit("change", { touch: this.touch });
+    const changeHandler = (e) => {
+      this.touch = !e.matches;
+      ee.emit("change", { touch: this.touch, vkb: this.touch });
       this._store &&
         this._store.dispatch({
           type: actions.TOUCH_CHANGED,
           payload: this.touch,
+        }) &&
+        this._store.dispatch({
+          type: actions.VKB_CHANGED,
+          payload: this.touch,
         });
     };
 
-    this._listenMouseMove(changeHandler);
-    this._listenTouchEvents(changeHandler);
+    window.matchMedia('(any-pointer: fine)').addEventListener('change', changeHandler);
   }
 
   /**
-   * It starts listening on `mousemove` event.
-   * It sets `touch=false` and invokes given `changeHandler` only if touch is true
-   * @param {Object} changeHandler
+   * It starts listening on `any-hover` media query and update `hover` property
    */
-  static _listenMouseMove(changeHandler) {
-    window.addEventListener(
-      "mousemove",
-      debounce((e) => {
-        if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) {
-          return;
-        }
+  static _manageHover() {
+    const changeHandler = (e) => {
+      this.hover = e.matches;
+      ee.emit("change", { hover: this.hover });
+      this._store &&
+        this._store.dispatch({
+          type: actions.HOVER_CHANGED,
+          payload: this.hover
+        });
+    };
 
-        if (!this.touch) {
-          return;
-        }
-
-        this.touch = false;
-        changeHandler();
-      }, 200)
-    );
-  }
-
-  /**
-   * It starts listening on `touchmove` and `touchstart` events.
-   * It sets `touch=true` and invokes given `changeHandler` only if touch is false
-   * @param {Object} changeHandler
-   */
-  static _listenTouchEvents(changeHandler) {
-    const eventHandler = debounce((e) => {
-      if (this.touch) {
-        return;
-      }
-
-      this.touch = true;
-      changeHandler();
-    }, 200);
-
-    window.addEventListener("touchmove", eventHandler);
-    window.addEventListener("touchstart", eventHandler);
+    window.matchMedia('(any-hover: hover)').addEventListener('change', changeHandler);
   }
 
   /**
@@ -165,10 +145,7 @@ export default class DeviceInfo {
    * It dispatches `change` event whenever `vkb` is changed.
    */
   static _manageVKB() {
-    //TODO: detect virtual keyboard changes
-    // ee.emit("change", { vkb });
-    // this._store &&
-    //   this._store.dispatch({ type: actions.VKB_CHANGED, payload: vkb });
+    //Futute enhancement: Detect virtual keyboard is supported OR not. Currently it's managed by `touch` and alias of it.
   }
 
   /**
@@ -202,6 +179,7 @@ export default class DeviceInfo {
     this.layout = this.constructor.layout;
     this.touch = this.constructor.touch;
     this.vkb = this.constructor.vkb;
+    this.hover = this.constructor.hover;
     this._onChange = this._onChange.bind(this);
     this._init();
   }
@@ -218,10 +196,11 @@ export default class DeviceInfo {
    * It updates changed properties value
    * @param {Object} details contains only properties which are changed
    */
-  _onChange({ layout, touch, vkb }) {
+  _onChange({ layout, touch, vkb, hover }) {
     this.layout = this.constructor.layout;
     this.touch = this.constructor.touch;
     this.vkb = this.constructor.vkb;
+    this.hover = this.constructor.hover;
     this.host.requestUpdate();
   }
 }

@@ -2,7 +2,8 @@ import {
   INIT,
   LAYOUT_CHANGED,
   TOUCH_CHANGED,
-  VKB_CHANGED
+  VKB_CHANGED,
+  HOVER_CHANGED
 } from './actions.js';
 
 export default (state = {}, action) => {
@@ -18,6 +19,9 @@ export default (state = {}, action) => {
 
     case VKB_CHANGED:
       return { ...state, vkb: action.payload };
+
+    case HOVER_CHANGED:
+      return { ...state, hover: action.payload };
 
     default:
       return state;

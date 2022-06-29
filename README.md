@@ -5,6 +5,7 @@ It's used to get detail about Device like:
 - Screen Size: small, medium, large, hd and fullhd
 - Pointer Interface: Mouse vs Touch
 - Keyboard Interface: Virtual vs Physical
+- Hover Interface: Hover is applicable to the element OR not
 
 Many UI components need to adjust their look & feel and/or behaviours based on this detail. They can use this to get this information; and get updated when any of this information is changed.
 
@@ -18,7 +19,7 @@ All of the @dreamworld/* Web Components uses (are going to use) this.
 import DeviceInfo from "@dreamworld/device-info";
 
 //Get info
-let deviceInfo = DeviceInfo.info(); // { layout: "small", touch: true, vkb: false }
+let deviceInfo = DeviceInfo.info(); // { layout: "small", touch: true, vkb: false, hover: true }
 
 
 //Bind event: Start listening for changes
@@ -43,7 +44,7 @@ class MyComponent extends LitElement {
   render() {
     return html`
       current layout: ${this.deviceInfo.layout} is touch enabled: ${this
-        .deviceInfo.touch} is Virtual keyboard supported: ${this.deviceInfo.vkb}
+        .deviceInfo.touch} is Virtual keyboard supported: ${this.deviceInfo.vkb} hover applicable: ${this.deviceInfo.hover}
     `;
   }
 }
@@ -62,6 +63,7 @@ DeviceInfo.initRedux(store);
 let layout = selectors.layout(state);
 let touchEnabled = selectors.touch(state);
 let virtualKeyBoardEnabled = selectors.vkb(state);
+let hoverApplicable = selectors.hover(state);
 ```
 
 It manages state at below path.
@@ -73,6 +75,7 @@ Path: `device-info`
 | layout        | String     | Possible values: `small`, `medium`, `large`, `hd` and `fullhd`. |
 | touch         | Boolean    | `true` if device touch is enabled. `false` otherwise. |
 | vkb           | Boolean    | `true` if device virtual keyboard is enabled. `false` otherwise. |
+| hover         | Boolean    | `true` if hover is applicable to the elements. `false` otherwise. |
  
 # Future Enhancements
 
