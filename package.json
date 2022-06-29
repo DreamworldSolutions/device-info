@@ -3,6 +3,9 @@
   "version": "0.0.0-development",
   "description": "It's used to get basic details of device(layout, touch and virtual keyboard).",
   "main": "device-info.js",
+  "scripts": {
+    "start": "web-dev-server"
+  },
   "type": "module",
   "repository": "git@github.com:DreamworldSolutions/device-info.git",
   "author": "Dhruval Kodinariya <dhruval@hisab.co>",
@@ -11,17 +14,28 @@
     "access": "public"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@web/dev-server": "^0.1.32",
+    "@web/dev-server-rollup": "^0.3.18",
+    "lit": "^2.2.6",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^4.2.0",
+    "redux-thunk": "^2.4.1",
     "semantic-release": "17.0.8"
   },
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
-      "master",
+      "main",
       {
-          "name": "feature/*",
-          "prerelease": "${name.replace(/^feature\\//g, \"\")}",
-          "channel": "${name.replace(/^feature\\//g, \"\")}"
+        "name": "feature/*",
+        "prerelease": "${name.replace(/^feature\\//g, \"\")}",
+        "channel": "${name.replace(/^feature\\//g, \"\")}"
       }
     ]
+  },
+  "dependencies": {
+    "@dreamworld/event-emitter": "^1.0.0",
+    "lodash-es": "^4.17.21"
   }
 }
