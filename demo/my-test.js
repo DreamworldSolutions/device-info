@@ -9,7 +9,8 @@ class MyTest extends connect(store)(LitElement) {
   static properties = {
     layout: { type: String },
     touch: { type: Boolean },
-    vkb: { type: Boolean }
+    vkb: { type: Boolean },
+    hover: { type: Boolean }
   };
 
   render() {
@@ -17,14 +18,16 @@ class MyTest extends connect(store)(LitElement) {
       Values updating through reactive controllers
       Layout: ${this.deviceInfo.layout}<br>
       Touch: ${this.deviceInfo.touch}<br>
-      VKB: ${this.deviceInfo.vkb}
+      VKB: ${this.deviceInfo.vkb}<br>
+      Hover: ${this.deviceInfo.hover}
 
       <br>
       <br>
       Values updating through state change
       Layout: ${this.layout}<br>
       Touch: ${this.touch}<br>
-      VKB: ${this.vkb}
+      VKB: ${this.vkb}<br>
+      hover: ${this.hover}
     `;
   }
 
@@ -32,6 +35,7 @@ class MyTest extends connect(store)(LitElement) {
     this.layout = selectors.layout(state);
     this.touch = selectors.touch(state);
     this.vkb = selectors.vkb(state);
+    this.hover = selectors.hover(state);
   }
 }
 
