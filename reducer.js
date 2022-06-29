@@ -3,14 +3,14 @@ import {
   LAYOUT_CHANGED,
   TOUCH_CHANGED,
   VKB_CHANGED,
-  HOVER_CHANGED
-} from './actions.js';
+  HOVER_CHANGED,
+} from "./actions.js";
 
 export default (state = {}, action) => {
   switch (action.type) {
     case INIT:
       return { ...action.payload };
-      
+
     case LAYOUT_CHANGED:
       return { ...state, layout: action.payload };
 

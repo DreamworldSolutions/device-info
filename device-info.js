@@ -21,9 +21,9 @@ export default class DeviceInfo {
    */
   static {
     this.layout = this._getCurrentLayout();
-    this.touch = !window.matchMedia('(any-pointer: fine)').matches;
-    this.vkb = !window.matchMedia('(any-pointer: fine)').matches;
-    this.hover = window.matchMedia('(any-hover: hover)').matches;
+    this.touch = !window.matchMedia("(any-pointer: fine)").matches;
+    this.vkb = !window.matchMedia("(any-pointer: fine)").matches;
+    this.hover = window.matchMedia("(any-hover: hover)").matches;
 
     this._manageLayout();
     this._manageTouch();
@@ -55,7 +55,7 @@ export default class DeviceInfo {
       layout: this.layout,
       touch: this.touch,
       vkb: this.vkb,
-      hover: this.hover
+      hover: this.hover,
     };
   }
 
@@ -97,7 +97,7 @@ export default class DeviceInfo {
     };
 
     forEach(mediaQueriesBylayout, (query) => {
-      window.matchMedia(query).addEventListener('change', mediaChangeHandler);
+      window.matchMedia(query).addEventListener("change", mediaChangeHandler);
     });
   }
 
@@ -120,7 +120,9 @@ export default class DeviceInfo {
         });
     };
 
-    window.matchMedia('(any-pointer: fine)').addEventListener('change', changeHandler);
+    window
+      .matchMedia("(any-pointer: fine)")
+      .addEventListener("change", changeHandler);
   }
 
   /**
@@ -133,11 +135,13 @@ export default class DeviceInfo {
       this._store &&
         this._store.dispatch({
           type: actions.HOVER_CHANGED,
-          payload: this.hover
+          payload: this.hover,
         });
     };
 
-    window.matchMedia('(any-hover: hover)').addEventListener('change', changeHandler);
+    window
+      .matchMedia("(any-hover: hover)")
+      .addEventListener("change", changeHandler);
   }
 
   /**

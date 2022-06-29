@@ -1,8 +1,8 @@
-import get from 'lodash-es/get.js';
+import get from "lodash-es/get.js";
 
 /**
  * It returns current layout of device.
- * @param {Object} state 
+ * @param {Object} state
  * @returns {String}
  */
 export const layout = (state) => {
@@ -11,7 +11,7 @@ export const layout = (state) => {
 
 /**
  * It returns `true` if currently touch is enabled in device. `false` otherwise.
- * @param {Object} state 
+ * @param {Object} state
  * @returns {Boolean}
  */
 export const touch = (state) => {
@@ -20,7 +20,7 @@ export const touch = (state) => {
 
 /**
  * It returns `true` if currently virtual keyboard is supported in device. `false` otherwise.
- * @param {Object} state 
+ * @param {Object} state
  */
 export const vkb = (state) => {
   return get(state, `device-info.vkb`);
@@ -28,8 +28,8 @@ export const vkb = (state) => {
 
 /**
  * It returns `true` if currently hover is applicable to the elements. `false` otherwise.
- * @param {Object} state 
+ * @param {Object} state
  */
- export const hover = (state) => {
+export const hover = (state) => {
   return get(state, `device-info.hover`);
 };
