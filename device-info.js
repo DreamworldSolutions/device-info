@@ -2,7 +2,7 @@ import EventEmitter from "@dreamworld/event-emitter";
 import forEach from "lodash-es/forEach.js";
 import * as actions from "./actions.js";
 import reducer from "./reducer.js";
-export * as selectors from "./selectors.js";
+import * as _selectors from "./selectors.js";
 
 const mediaQueriesBylayout = {
   small: "only screen and (max-width: 600px)",
@@ -19,7 +19,7 @@ export default class DeviceInfo {
    * It initializes `layout`, `touch` and `vkb`.
    * It also start listening/managing of `layout`, `touch` and `vkb`
    */
-  static {
+  static _init() {
     this.layout = this._getCurrentLayout();
     this.touch = !window.matchMedia("(any-pointer: fine)").matches;
     this.vkb = !window.matchMedia("(any-pointer: fine)").matches;
@@ -208,3 +208,7 @@ export default class DeviceInfo {
     this.host.requestUpdate();
   }
 }
+
+DeviceInfo._init();
+
+export const selectors = _selectors;
