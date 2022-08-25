@@ -35,10 +35,10 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
-"@dreamworld/event-emitter@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@dreamworld/event-emitter/-/event-emitter-1.0.0.tgz#960688fbc14ad49fd6f52b73aa777da3e4982d8e"
-  integrity sha512-sSpLFZzIBoGEa3To2u1BfudNju46Ok0RIqRzXnWPwlCMtwzqqY+Tu9at9kRaOTK/921UuO7ubY5zSy21qXgiPw==
+"@dreamworld/event-emitter@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@dreamworld/event-emitter/-/event-emitter-1.1.0.tgz#576af754e42abbbb24aee07e47f76d589656bd72"
+  integrity sha512-B2qURdBRBrr2+6figkq6a+eGtAcGANkYhqLGsrNEr8qePD6jWhGx9DZvw5ql1qLIne35b4VsheYLSh24ttQMxA==
 
 "@gar/promisify@^1.0.1":
   version "1.1.3"
