@@ -12,8 +12,9 @@ Many UI components need to adjust their look & feel and/or behaviours based on t
 All of the @dreamworld/* Web Components uses (are going to use) this.
 
 ## Usage Guide
+- There are the 3 ways to use device-info.
 
-### Use it Globally (Plain JS)
+### 1. Use it Globally (Plain JS)
 
 ```javascript
 import DeviceInfo from "@dreamworld/device-info";
@@ -31,7 +32,7 @@ DeviceInfo.on("change", (details) => {
 DeviceInfo.off("change", handler);
 ```
 
-### Use it as Lit Reactive Controller
+### 2. Use it as Lit Reactive Controller
 
 ```javascript
 import { LitElement, html } from "lit";
@@ -50,7 +51,7 @@ class MyComponent extends LitElement {
 }
 ```
 
-### Enable redux
+### 3. Use with redux
 
 ```javascript
 import { default as DeviceInfo, selectors } from "@dreamworld/device-info";
