@@ -21,8 +21,8 @@ export default class DeviceInfo {
    */
   static _init() {
     this.layout = this._getCurrentLayout();
-    this.touch = !window.matchMedia("(any-pointer: fine)").matches;
-    this.vkb = !window.matchMedia("(any-pointer: fine)").matches;
+    this.touch = window.matchMedia("(pointer: coarse)").matches;
+    this.vkb = window.matchMedia("(pointer: coarse)").matches;
     this.hover = window.matchMedia("(any-hover: hover)").matches;
 
     this._manageLayout();
@@ -107,7 +107,7 @@ export default class DeviceInfo {
    */
   static _manageTouch() {
     const changeHandler = (e) => {
-      this.touch = !e.matches;
+      this.touch = e.matches;
       ee.emit("change", { touch: this.touch, vkb: this.touch });
       this._store &&
         this._store.dispatch({
@@ -121,7 +121,7 @@ export default class DeviceInfo {
     };
 
     window
-      .matchMedia("(any-pointer: fine)")
+      .matchMedia("(pointer: coarse)")
       .addEventListener("change", changeHandler);
   }
 
