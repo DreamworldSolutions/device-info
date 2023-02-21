@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@dreamworld/event-emitter": "^1.1.0",
+    "@dreamworld/pwa-helpers": "^1.16.1",
     "lodash-es": "^4.17.21"
   }
 }
