@@ -43,7 +43,7 @@ export default class DeviceInfo {
       "device-info": reducer,
     });
 
-    const initialState = this.info(this.device);
+    const initialState = this.info();
     this._store.dispatch({ type: actions.INIT, payload: initialState });
   }
 
