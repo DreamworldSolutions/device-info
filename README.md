@@ -20,8 +20,7 @@ All of the @dreamworld/* Web Components uses (are going to use) this.
 import DeviceInfo from "@dreamworld/device-info";
 
 // Get info 
-// `device` is mandatory for SSR. Its possible values are: 'mobile', 'tablet', 'desktop'
-let deviceInfo = DeviceInfo.info(device); // { layout: "small", touch: true, vkb: false, hover: true }
+let deviceInfo = DeviceInfo.info(); // { layout: "small", touch: true, vkb: false, hover: true }
 
 
 //Bind event: Start listening for changes
@@ -40,7 +39,7 @@ import { LitElement, html } from "lit";
 import DeviceInfo from "@dreamworld/device-info";
 
 class MyComponent extends LitElement {
-  deviceInfo = new DeviceInfo(this, {device}); // On SSR, `device` option is mandatory. Its possible values are: 'mobile', 'tablet', 'desktop'
+  deviceInfo = new DeviceInfo(this, { device }); // On SSR, `device` option is mandatory. Its possible values are: 'mobile', 'tablet', 'desktop'
 
   // Use the controller in render()
   render() {
@@ -57,8 +56,12 @@ class MyComponent extends LitElement {
 ```javascript
 import { default as DeviceInfo, selectors } from "@dreamworld/device-info";
 
-//Init redux
-DeviceInfo.initRedux(store, device); // On SSR, `device` is mandatory. Its possible values are: 'mobile', 'tablet', 'desktop'
+//Init redux (client side)
+DeviceInfo.initRedux(store,);
+
+// Inti redux on Server side.
+const instance = new DeviceInfo(null, { device }); // On SSR, `device` option is mandatory. Its possible values are: 'mobile', 'tablet', 'desktop'
+instance.initReduxOnServer(store); 
 
 //use selectors to read details from redux store
 

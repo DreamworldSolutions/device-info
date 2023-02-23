@@ -35,21 +35,29 @@ export default class DeviceInfo {
   /**
    * Sets initial state of `device-info` into redux state.
    * @param {Object} store Redux store.
-   * @param {String} device Current Device. Its used only for SSR. Possible values: 'mobile', 'tablet' or 'desktop'
    */
-  static initRedux(store, device) {
-    if(isServer && !device){
-      throw 'device-info > initRedux: Device is not provided on SSR.';
-    }
-
+  static initRedux(store) {
     this._store = store;
 
     store.addReducers({
       "device-info": reducer,
     });
 
-    const initialState = this.info(device);
+    const initialState = this.info(this.device);
     this._store.dispatch({ type: actions.INIT, payload: initialState });
+  }
+
+  /**
+   * Sets initial state of `device-info` into redux state on Server.
+   * @param {Object} store Redux store.
+   */
+  initReduxOnServer(store) {
+    store.addReducers({
+      "device-info": reducer,
+    });
+
+    const initialState = this.constructor.info(this.device);
+    store.dispatch({ type: actions.INIT, payload: initialState });
   }
 
   /**
@@ -196,16 +204,18 @@ export default class DeviceInfo {
 
   constructor(host, options={}) {
     host && (this.host = host).addController(this);
-    const device = options.device;
-    if(isServer && !device){
+    
+    this.device = options.device;
+    if(isServer && !this.device){
       throw 'device-info > constructor: `device` option is not provided on SSR.';
     }
 
-    if(isServer){
-      this.layout = device === 'mobile' ? 'small' : device === 'tablet' ? 'medium' : 'hd';
+    if(isServer) {
+      this.layout = this.device === 'mobile' ? 'small' : this.device === 'tablet' ? 'medium' : 'hd';
       this.touch = this.layout !== 'hd';
       this.vkb = this.layout !== 'hd';
       this.hover = this.layout === 'hd';
+      return;
     }
 
     this.layout = this.constructor.layout;
