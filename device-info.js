@@ -227,7 +227,7 @@ export default class DeviceInfo {
   }
 
   /**
-   * Intialize instance
+   * Initialize instance
    */
   _init() {
     this.constructor.on("change", this._onChange);

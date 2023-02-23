@@ -56,10 +56,10 @@ class MyComponent extends LitElement {
 ```javascript
 import { default as DeviceInfo, selectors } from "@dreamworld/device-info";
 
-//Init redux (client side)
+//Init redux on client side
 DeviceInfo.initRedux(store,);
 
-// Inti redux on Server side.
+// Init redux on server side.
 const instance = new DeviceInfo(null, { device }); // On SSR, `device` option is mandatory. Its possible values are: 'mobile', 'tablet', 'desktop'
 instance.initReduxOnServer(store); 
 
