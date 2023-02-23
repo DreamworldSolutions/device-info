@@ -3,6 +3,7 @@ import forEach from "lodash-es/forEach.js";
 import * as actions from "./actions.js";
 import reducer from "./reducer.js";
 import * as _selectors from "./selectors.js";
+import { isServer } from "@dreamworld/pwa-helpers/lit.js";
 
 const mediaQueriesBylayout = {
   small: "only screen and (max-width: 600px)",
@@ -32,8 +33,8 @@ export default class DeviceInfo {
   }
 
   /**
-   * It initializes redux state
-   * @param {Object} store
+   * Sets initial state of `device-info` into redux state.
+   * @param {Object} store Redux store.
    */
   static initRedux(store) {
     this._store = store;
@@ -42,20 +43,43 @@ export default class DeviceInfo {
       "device-info": reducer,
     });
 
-    let initialState = this.info();
+    const initialState = this.info();
     this._store.dispatch({ type: actions.INIT, payload: initialState });
   }
 
   /**
-   * Returns device info
-   * @return {Object} contains { layout, touch, vkb }
+   * Sets initial state of `device-info` into redux state on Server.
+   * @param {Object} store Redux store.
    */
-  static info() {
+  initReduxOnServer(store) {
+    store.addReducers({
+      "device-info": reducer,
+    });
+
+    const initialState = this.constructor.info(this.device);
+    store.dispatch({ type: actions.INIT, payload: initialState });
+  }
+
+  /**
+   * @param {String} device Current Device. Its used only for SSR. Possible values: 'mobile', 'tablet' or 'desktop'
+   * @returns {Object} contains { layout, touch, vkb }
+   */
+  static info(device) {
+    if(!device){
+      return {
+        layout: this.layout,
+        touch: this.touch,
+        vkb: this.vkb,
+        hover: this.hover,
+      };
+    }
+
+    const layout = device === 'mobile' ? 'small' : device === 'tablet' ? 'medium' : 'hd';
     return {
-      layout: this.layout,
-      touch: this.touch,
-      vkb: this.vkb,
-      hover: this.hover,
+      layout,
+      touch: layout !== 'hd',
+      vkb: layout !== 'hd',
+      hover: layout === 'hd',
     };
   }
 
@@ -178,8 +202,22 @@ export default class DeviceInfo {
     ee.off(eventName, eventHandler);
   }
 
-  constructor(host) {
+  constructor(host, options={}) {
     host && (this.host = host).addController(this);
+    
+    this.device = options.device;
+    if(isServer && !this.device){
+      throw 'device-info > constructor: `device` option is not provided on SSR.';
+    }
+
+    if(isServer) {
+      this.layout = this.device === 'mobile' ? 'small' : this.device === 'tablet' ? 'medium' : 'hd';
+      this.touch = this.layout !== 'hd';
+      this.vkb = this.layout !== 'hd';
+      this.hover = this.layout === 'hd';
+      return;
+    }
+
     this.layout = this.constructor.layout;
     this.touch = this.constructor.touch;
     this.vkb = this.constructor.vkb;
@@ -189,7 +227,7 @@ export default class DeviceInfo {
   }
 
   /**
-   * Intialize instance
+   * Initialize instance
    */
   _init() {
     this.constructor.on("change", this._onChange);
@@ -209,6 +247,8 @@ export default class DeviceInfo {
   }
 }
 
-DeviceInfo._init();
+if (!isServer) {
+  DeviceInfo._init();
+}
 
 export const selectors = _selectors;

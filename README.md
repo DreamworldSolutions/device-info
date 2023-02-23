@@ -19,7 +19,7 @@ All of the @dreamworld/* Web Components uses (are going to use) this.
 ```javascript
 import DeviceInfo from "@dreamworld/device-info";
 
-//Get info
+// Get info 
 let deviceInfo = DeviceInfo.info(); // { layout: "small", touch: true, vkb: false, hover: true }
 
 
@@ -39,7 +39,7 @@ import { LitElement, html } from "lit";
 import DeviceInfo from "@dreamworld/device-info";
 
 class MyComponent extends LitElement {
-  deviceInfo = new DeviceInfo(this);
+  deviceInfo = new DeviceInfo(this, { device }); // On SSR, `device` option is mandatory. Its possible values are: 'mobile', 'tablet', 'desktop'
 
   // Use the controller in render()
   render() {
@@ -56,8 +56,12 @@ class MyComponent extends LitElement {
 ```javascript
 import { default as DeviceInfo, selectors } from "@dreamworld/device-info";
 
-//Init redux
-DeviceInfo.initRedux(store);
+//Init redux on client side
+DeviceInfo.initRedux(store,);
+
+// Init redux on server side.
+const instance = new DeviceInfo(null, { device }); // On SSR, `device` option is mandatory. Its possible values are: 'mobile', 'tablet', 'desktop'
+instance.initReduxOnServer(store); 
 
 //use selectors to read details from redux store
 
