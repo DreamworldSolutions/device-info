@@ -132,6 +132,7 @@ export default class DeviceInfo {
   static _manageTouch() {
     const changeHandler = (e) => {
       this.touch = e.matches;
+      this.vkb = this.touch;
       ee.emit("change", { touch: this.touch, vkb: this.touch });
       this._store &&
         this._store.dispatch({
