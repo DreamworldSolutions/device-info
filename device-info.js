@@ -6,11 +6,11 @@ import * as _selectors from "./selectors.js";
 import { isServer } from "@dreamworld/pwa-helpers/lit.js";
 
 const mediaQueriesBylayout = {
-  small: "only screen and (max-width: 600px)",
-  medium: "only screen and (min-width: 600px) and (max-width: 999px)",
-  large: "only screen and (min-width: 1000px) and (max-width: 1299px)",
-  hd: "only screen and (min-width: 1300px) and (max-width: 1899px)",
-  fullhd: "only screen and (min-width: 1900px)",
+  small: "only screen and (max-width: 576px)",
+  medium: "only screen and (min-width: 577px) and (max-width: 768px)",
+  large: "only screen and (min-width: 769px) and (max-width: 1024px)",
+  hd: "only screen and (min-width: 1025px) and (max-width: 1400px)",
+  fullhd: "only screen and (min-width: 1401px)",
 };
 
 var ee = new EventEmitter();
